@@ -15,23 +15,11 @@ default_args = {
     'depends_on_past': True 
 }
 
-@dag(
-    dag_id="model_pipeline",
-    start_date=datetime(2022, 1 ,1), 
-    schedule_interval=None, 
-    default_args=default_args,
-    catchup=False
-)
-
-def model():
-    model_dir = os.path.join(root_dir, 'dags', 'model')
-
-    model_task_id = BashOperator(
+with DAG("model_dag", start_date=datetime(2023, 1, 27),
+schedule ="@daily", catchup=False) as dag:
+    training_model = BashOperator(
         task_id="model_train",
-        bash_command=f"cd {model_dir} && python main.py"
-    )
-    
-    model_task_id
-
-# Define DAGs
-model_dag = model()
+        bash_command=f"cd {os.path.join(root_dir, 'dags', 'model')} && python main.py"
+        )
+    print(training_model)
+    training_model
